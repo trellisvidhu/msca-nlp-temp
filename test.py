@@ -42,6 +42,71 @@ def nltk_pre_process(text_data):
 
   return words
 
+def ngram_compare_files(file1,file2,n):
+    # Takes two files
+    # hashes their n-grams into twos lists
+    # calculates the intersection and union
+    # of the two lists, and returns
+    # Jacard similarity value
+ 
+    stop = stopwords.words('english')
+    f1 = open(file1)
+    raw = f1.read()
+    f1.close()
+    f1_grams = nltk.ngrams(raw.split(),n)
+    
+    array_1 = []
+    
+    for gram in f1_grams:
+        array_1.append(hash(gram))
+    f2 = open(file2)
+    raw = f2.read()
+    f2.close()
+    f2_grams = nltk.ngrams(raw.split(),n)
+    
+    array_2 = []
+    
+    for gram in f2_grams:
+        array_2.append(hash(gram))
+        
+    intersection = len(list(set(array_1).intersection(array_2)))    
+    union = len(set(array_1)) + len(set(array_2)) - intersection
+    jacard_similarity = intersection / union
+    return jacard_similarity
+
+def pairs_of_files(directory):
+    # returns combination of two files given
+    # all files in a directory
+    
+    dir = os.listdir(directory)
+    combo = combinations(dir, 2)
+    return combo
+
+def compare_files(directory,ngram_size,threshold):
+    # compares all pairs of files in a directory
+    # for similarity.
+    # RETURNS: Dictionary, with key as
+    # comma-separated string of two files
+    # and value of similarity index as decimal
+    # where similarity index is above threshold
+    # value.
+    
+    compare_dictionary = {}
+    
+    ngram = ngram_size
+    combo = pairs_of_files(directory)
+    
+    for i in combo:
+        
+        sim = ngram_compare_files(directory+str(i[0]),directory+str(i[1]),ngram)
+        if sim > threshold:
+            
+            key = str(i[0]) + "," + str(i[1])
+            value = sim
+            compare_dictionary[key]=value
+            
+    return compare_dictionary            
+
 if __name__ == '__main__':
   
   #----------------------------------------
